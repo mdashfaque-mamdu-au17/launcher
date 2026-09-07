@@ -75,7 +75,7 @@ export function MiddleControls({
         </TouchableOpacity>
       </View>
 
-      {/* Row 2: Focus / Do Not Disturb Horizontal Pill */}
+      {/* Row 2: Focus Pill (iOS 18 style) */}
       <TouchableOpacity
         style={[
           styles.dndPill,
@@ -88,13 +88,10 @@ export function MiddleControls({
         }}
         activeOpacity={0.75}
       >
-        <Text style={[styles.dndMoon, dndActive && styles.dndMoonActive]}>🌙</Text>
-        <View style={styles.dndTextContainer}>
+        <View style={styles.focusPillContent}>
+          <Text style={[styles.dndMoon, dndActive && styles.dndMoonActive]}>🌙</Text>
           <Text style={[styles.dndTitle, dndActive && styles.dndTitleActive]}>
-            Do Not Disturb
-          </Text>
-          <Text style={[styles.dndSubtitle, dndActive && styles.dndSubtitleActive]}>
-            {dndActive ? 'On' : 'Off'}
+            Focus
           </Text>
         </View>
       </TouchableOpacity>
@@ -161,127 +158,48 @@ interface BottomPillsProps {
 }
 
 export function BottomPillsRow({ twoColWidth, onClose }: BottomPillsProps) {
-  const [lightsActive, setLightsActive] = useState(false);
-  const [timerRunning, setTimerRunning] = useState(false);
+  // We'll use the twoColWidth/2 for column layout or just fixed widths.
+  // The iOS grid usually has 4 columns per row.
+  const gap = 12;
+  const itemSize = 62; // Circular item size
 
   return (
     <View style={styles.bottomPillsWrapper}>
       {/* Row 1 */}
-      <View style={styles.pillRow}>
-        <TouchableOpacity
-          style={[
-            styles.utilityPill,
-            { width: twoColWidth },
-            lightsActive && styles.utilityPillActive,
-          ]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            setLightsActive(!lightsActive);
-          }}
-          activeOpacity={0.75}
-        >
-          <View style={styles.pillIconBox}>
-            <LightbulbIcon active={lightsActive} size={18} />
-          </View>
-          <View style={styles.pillTextBox}>
-            <Text style={styles.pillHeading}>Bedroom Lights</Text>
-            <Text style={styles.pillSubheading}>{lightsActive ? 'On' : 'Off'}</Text>
-          </View>
+      <View style={styles.circularGridRow}>
+        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
+          <FlashlightIcon active={false} size={22} />
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
+          <StopwatchIcon size={22} />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.utilityPill,
-            { width: twoColWidth },
-            timerRunning && styles.utilityPillOrange,
-          ]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            setTimerRunning(!timerRunning);
-          }}
-          activeOpacity={0.75}
-        >
-          <View style={styles.pillIconBox}>
-            <StopwatchIcon size={18} />
-          </View>
-          <View style={styles.pillTextBox}>
-            <Text style={styles.pillHeading}>Timer</Text>
-            <Text style={styles.pillSubheading}>{timerRunning ? '00:15' : 'Ready'}</Text>
-          </View>
+        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp('com.android.calculator2'); onClose(); }}>
+          <Text style={styles.emojiIcon}>🧮</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp('com.android.camera2'); onClose(); }}>
+          <Text style={styles.emojiIcon}>📷</Text>
         </TouchableOpacity>
       </View>
 
       {/* Row 2 */}
-      <View style={styles.pillRow}>
-        <TouchableOpacity
-          style={[styles.utilityPill, { width: twoColWidth }]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            Alert.alert('Music Recognition', 'Listening for songs via Shazam...');
-          }}
-          activeOpacity={0.75}
-        >
-          <View style={styles.pillIconBox}>
-            <ShazamIcon size={18} />
-          </View>
-          <View style={styles.pillTextBox}>
-            <Text style={styles.pillHeading}>Recognize Music</Text>
-            <Text style={styles.pillSubheading}>Shazam</Text>
-          </View>
+      <View style={styles.circularGridRow}>
+        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
+          <ScreenRecordIcon active={false} size={22} />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.utilityPill, { width: twoColWidth }]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            Alert.alert('Voice Memo', 'Opening Voice Recorder...');
-          }}
-          activeOpacity={0.75}
-        >
-          <View style={styles.pillIconBox}>
-            <WaveformIcon size={18} />
-          </View>
-          <View style={styles.pillTextBox}>
-            <Text style={styles.pillHeading}>Voice Memo</Text>
-            <Text style={styles.pillSubheading}>Tap to Record</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      {/* Row 3 */}
-      <View style={styles.pillRow}>
-        <TouchableOpacity
-          style={[styles.utilityPill, { width: twoColWidth }]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            Alert.alert('Home Scenes', 'Select a smart home preset');
-          }}
-          activeOpacity={0.75}
-        >
-          <View style={styles.pillIconBox}>
-            <Text style={styles.homeEmoji}>🏠</Text>
-          </View>
-          <View style={styles.pillTextBox}>
-            <Text style={styles.pillHeading}>Choose Scene...</Text>
-            <Text style={styles.pillSubheading}>Home Automation</Text>
-          </View>
+        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
+          <WaveformIcon size={22} />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.utilityPill, { width: twoColWidth }]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            LauncherBridge?.openDefaultAppsSettings?.();
-          }}
-          activeOpacity={0.75}
-        >
-          <View style={styles.pillIconBox}>
-            <Text style={styles.homeEmoji}>⚙️</Text>
-          </View>
-          <View style={styles.pillTextBox}>
-            <Text style={styles.pillHeading}>System Settings</Text>
-            <Text style={styles.pillSubheading}>Preferences</Text>
-          </View>
+        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
+          <ScreenMirrorIcon size={22} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
+          <ShazamIcon size={22} />
         </TouchableOpacity>
       </View>
     </View>
@@ -299,8 +217,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   circleCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderWidth: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderWidth: 0.8,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -325,8 +244,9 @@ const styles = StyleSheet.create({
   dndPill: {
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderWidth: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderWidth: 0.8,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
@@ -335,9 +255,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#5856D6',
     borderColor: '#7A79E8',
   },
+  focusPillContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
   dndMoon: {
-    fontSize: 18,
-    marginRight: 10,
+    fontSize: 16,
+    marginRight: 6,
   },
   dndMoonActive: {
     color: '#ffffff',
@@ -370,8 +296,9 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderWidth: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderWidth: 0.8,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -404,54 +331,26 @@ const styles = StyleSheet.create({
     borderRadius: 1,
   },
   bottomPillsWrapper: {
-    marginTop: 12,
-    gap: 10,
+    marginTop: 16,
+    gap: 16,
+    paddingHorizontal: 6,
   },
-  pillRow: {
+  circularGridRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  utilityPill: {
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderWidth: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-  },
-  utilityPillActive: {
-    backgroundColor: 'rgba(255, 214, 10, 0.22)',
-    borderColor: '#FFD60A',
-  },
-  utilityPillOrange: {
-    backgroundColor: 'rgba(255, 149, 0, 0.22)',
-    borderColor: '#FF9500',
-  },
-  pillIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  gridCircle: {
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderWidth: 0.8,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
   },
-  pillTextBox: {
-    justifyContent: 'center',
-  },
-  pillHeading: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#ffffff',
-  },
-  pillSubheading: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.55)',
-  },
-  homeEmoji: {
-    fontSize: 16,
+  emojiIcon: {
+    fontSize: 22,
   },
 });

@@ -126,9 +126,10 @@ export function LiquidCapsuleSlider({
 
 const styles = StyleSheet.create({
   capsuleWrapper: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     borderRadius: 36,
-    borderWidth: 0,
+    borderWidth: 0.8,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     overflow: 'hidden',
     position: 'relative',
     justifyContent: 'flex-end',
@@ -139,9 +140,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#ffffff',
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderBottomLeftRadius: 36,
+    borderBottomRightRadius: 36,
   },
   specularHighlight: {
     position: 'absolute',
