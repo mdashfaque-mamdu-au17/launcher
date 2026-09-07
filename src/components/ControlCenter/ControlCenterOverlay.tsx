@@ -309,10 +309,10 @@ const styles = StyleSheet.create({
     zIndex: 99999,
   },
   fullScreenBackdrop: {
-    backgroundColor: 'rgba(6, 8, 14, 0.94)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
   },
   controlCenterCanvas: {
-    backgroundColor: '#0c0e17',
+    backgroundColor: 'transparent',
     paddingHorizontal: 16,
     justifyContent: 'space-between',
   },

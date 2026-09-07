@@ -3,13 +3,13 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   Animated,
-  TouchableOpacity,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native';
 import { AppIconProps } from '../types/launcher';
-import { ICON_SIZE, ITEM_WIDTH } from '../constants/layout';
+import { ITEM_WIDTH } from '../constants/layout';
+import { IOSAppIcon } from './IOSAppIcon';
 
 export function AppIconItem({
   app,
@@ -76,28 +76,10 @@ export function AppIconItem({
             },
           ]}
         >
-          {/* iOS Liquid Glass Rim Container */}
-          <View style={styles.liquidGlassRim}>
-            <View style={styles.iconWrapper}>
-              {app.icon ? (
-                <Image
-                  source={{ uri: app.icon }}
-                  style={styles.appIcon}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View style={styles.placeholderIcon}>
-                  <Text style={styles.placeholderText}>
-                    {app.label.charAt(0).toUpperCase()}
-                  </Text>
-                </View>
-              )}
-            </View>
-            {/* Top specular highlight shine */}
-            <View style={styles.specularShine} />
-          </View>
+          {/* iOS-style squircle icon — covers system apps with authentic look */}
+          <IOSAppIcon app={app} />
 
-          {/* iOS Minus Badge */}
+          {/* iOS Minus Badge shown in edit mode */}
           {isEditing && (
             <TouchableOpacity
               style={styles.jiggleBadge}
@@ -127,58 +109,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  liquidGlassRim: {
-    borderRadius: 18,
-    overflow: 'hidden',
-    position: 'relative',
-    borderTopWidth: 1.5,
-    borderTopColor: 'rgba(255, 255, 255, 0.65)',
-    borderLeftWidth: 1,
-    borderLeftColor: 'rgba(255, 255, 255, 0.4)',
-    borderRightWidth: 1,
-    borderRightColor: 'rgba(255, 255, 255, 0.25)',
-    borderBottomWidth: 1.2,
-    borderBottomColor: 'rgba(0, 0, 0, 0.25)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.35,
-    shadowRadius: 7,
-    elevation: 5,
-  },
-  specularShine: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '42%',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
-  },
-  iconWrapper: {
-    width: ICON_SIZE,
-    height: ICON_SIZE,
-    borderRadius: 18,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.14)',
-  },
-  appIcon: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 18,
-  },
-  placeholderIcon: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.22)',
-  },
-  placeholderText: {
-    color: '#ffffff',
-    fontSize: 22,
-    fontWeight: '700',
   },
   jiggleBadge: {
     position: 'absolute',

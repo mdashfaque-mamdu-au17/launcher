@@ -101,18 +101,12 @@ export function ConnectivityPlatter({ size }: ConnectivityPlatterProps) {
 
 const styles = StyleSheet.create({
   platterCard: {
-    backgroundColor: '#1c1f2b',
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.16)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 36,
+    borderWidth: 0,
     padding: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 8,
   },
   gridContainer: {
     width: '100%',
