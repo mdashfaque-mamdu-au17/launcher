@@ -8,8 +8,14 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.hardware.camera2.CameraManager
 import android.media.AudioManager
+import android.os.BatteryManager
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.provider.Settings
 import android.util.Base64
+import android.view.KeyEvent
 import android.view.WindowManager
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
@@ -226,6 +232,135 @@ class LauncherBridgeModule(private val reactContext: ReactApplicationContext) :
             } catch (err: Exception) {
                 promise.reject("SETTINGS_ERROR", "Failed to open settings: ${err.message}", err)
             }
+        }
+    }
+
+    @ReactMethod
+    fun sendMediaKeyEvent(keyCode: Double, promise: Promise) {
+        try {
+            val code = keyCode.toInt()
+            val audioManager = reactContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val downEvent = KeyEvent(KeyEvent.ACTION_DOWN, code)
+            val upEvent = KeyEvent(KeyEvent.ACTION_UP, code)
+            audioManager.dispatchMediaKeyEvent(downEvent)
+            audioManager.dispatchMediaKeyEvent(upEvent)
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.reject("MEDIA_KEY_ERROR", "Failed to dispatch media key: ${e.message}", e)
+        }
+    }
+
+    @ReactMethod
+    fun isMusicActive(promise: Promise) {
+        try {
+            val audioManager = reactContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            promise.resolve(audioManager.isMusicActive)
+        } catch (e: Exception) {
+            promise.resolve(false)
+        }
+    }
+
+    @ReactMethod
+    fun openInternetPanel(promise: Promise) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val intent = Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                reactContext.startActivity(intent)
+                promise.resolve(true)
+            } else {
+                openWifiSettings(promise)
+            }
+        } catch (e: Exception) {
+            openWifiSettings(promise)
+        }
+    }
+
+    @ReactMethod
+    fun openBatterySettings(promise: Promise) {
+        try {
+            val intent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            reactContext.startActivity(intent)
+            promise.resolve(true)
+        } catch (e: Exception) {
+            try {
+                val fallback = Intent(Intent.ACTION_POWER_USAGE_SUMMARY).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                reactContext.startActivity(fallback)
+                promise.resolve(true)
+            } catch (err: Exception) {
+                promise.reject("BATTERY_SETTINGS_ERROR", err.message, err)
+            }
+        }
+    }
+
+    @ReactMethod
+    fun triggerHaptic(type: String, promise: Promise) {
+        try {
+            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vm = reactContext.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                vm.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                reactContext.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val effect = when (type.lowercase()) {
+                    "click" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+                    } else {
+                        VibrationEffect.createOneShot(12, 120)
+                    }
+                    "tick" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK)
+                    } else {
+                        VibrationEffect.createOneShot(8, 70)
+                    }
+                    "heavy" -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)
+                    } else {
+                        VibrationEffect.createOneShot(25, 255)
+                    }
+                    else -> VibrationEffect.createOneShot(10, 100)
+                }
+                vibrator.vibrate(effect)
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(12)
+            }
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.resolve(false)
+        }
+    }
+
+    @ReactMethod
+    fun getBatteryStatus(promise: Promise) {
+        try {
+            val ifilter = android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+            val batteryStatus: Intent? = reactContext.registerReceiver(null, ifilter)
+            val level = batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+            val scale = batteryStatus?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+            val batteryPct = if (level >= 0 && scale > 0) ((level.toFloat() / scale.toFloat()) * 100).toInt() else 85
+            val status = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+            val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
+
+            val result = Arguments.createMap().apply {
+                putInt("level", batteryPct)
+                putBoolean("isCharging", isCharging)
+            }
+            promise.resolve(result)
+        } catch (e: Exception) {
+            val fallback = Arguments.createMap().apply {
+                putInt("level", 85)
+                putBoolean("isCharging", false)
+            }
+            promise.resolve(fallback)
         }
     }
 
