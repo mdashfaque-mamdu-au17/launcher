@@ -1,15 +1,107 @@
-import React, { useState } from 'react';
+import React, { useState, ReactElement } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { LauncherBridge } from '../../services/LauncherBridge';
 import {
   FlashlightIcon,
   ScreenRecordIcon,
   ScreenMirrorIcon,
-  LightbulbIcon,
   StopwatchIcon,
   ShazamIcon,
   WaveformIcon,
 } from './CCIcons';
+
+// ─── Pure-View drawn icons ─────────────────────────────────────────────────
+
+function LockRotateIcon({ locked = false }: { locked?: boolean }) {
+  return (
+    <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
+      {/* Circle representing screen */}
+      <View style={{
+        width: 14, height: 14, borderRadius: 7,
+        borderWidth: 2, borderColor: '#fff',
+      }} />
+      {/* Lock icon overlaid top-right when locked */}
+      {locked && (
+        <View style={{ position: 'absolute', top: 1, right: 1 }}>
+          <View style={{ width: 7, height: 6, borderRadius: 1.5, borderWidth: 1.5, borderColor: '#fff', borderBottomWidth: 0 }} />
+          <View style={{ width: 7, height: 5, backgroundColor: '#fff', borderBottomLeftRadius: 1, borderBottomRightRadius: 1 }} />
+        </View>
+      )}
+      {/* Rotation arrow when unlocked */}
+      {!locked && (
+        <View style={{ position: 'absolute', top: 0, right: 0, width: 8, height: 8 }}>
+          <View style={{ width: 8, height: 8, borderRadius: 4, borderWidth: 1.5, borderColor: '#fff', borderLeftColor: 'transparent' }} />
+        </View>
+      )}
+    </View>
+  );
+}
+
+function BellIcon({ muted = false }: { muted?: boolean }) {
+  const color = muted ? '#FF3B30' : '#fff';
+  return (
+    <View style={{ width: 20, height: 22, alignItems: 'center', justifyContent: 'center' }}>
+      {/* Bell dome */}
+      <View style={{
+        width: 14, height: 11, borderTopLeftRadius: 7, borderTopRightRadius: 7,
+        borderWidth: 2, borderColor: color, borderBottomWidth: 0,
+        marginTop: 3,
+      }} />
+      {/* Bell base */}
+      <View style={{ width: 18, height: 2.5, backgroundColor: color, borderRadius: 1 }} />
+      {/* Bell clapper */}
+      <View style={{ width: 5, height: 5, borderRadius: 2.5, borderWidth: 2, borderColor: color, marginTop: 1 }} />
+      {/* Muted diagonal line */}
+      {muted && (
+        <View style={{
+          position: 'absolute', width: 2, height: 26,
+          backgroundColor: '#FF3B30', borderRadius: 1,
+          transform: [{ rotate: '45deg' }],
+        }} />
+      )}
+    </View>
+  );
+}
+
+function CalculatorIcon() {
+  return (
+    <View style={{ width: 20, height: 20, borderWidth: 1.5, borderColor: '#fff', borderRadius: 3, padding: 2 }}>
+      {[[1,1],[1,1]].map((row, ri) => (
+        <View key={ri} style={{ flexDirection: 'row', flex: 1, gap: 2 }}>
+          {row.map((_, ci) => (
+            <View key={ci} style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.6)', borderRadius: 1 }} />
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <View style={{ width: 22, height: 17, borderWidth: 1.5, borderColor: '#fff', borderRadius: 3, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 8, height: 8, borderRadius: 4, borderWidth: 1.5, borderColor: '#fff' }} />
+      <View style={{
+        position: 'absolute', top: -4, left: 5,
+        width: 6, height: 4, borderTopLeftRadius: 2, borderTopRightRadius: 2,
+        borderWidth: 1.5, borderColor: '#fff', borderBottomWidth: 0,
+      }} />
+    </View>
+  );
+}
+
+function TorchIcon({ on = false }: { on?: boolean }) {
+  const c = on ? '#14151b' : '#fff';
+  return (
+    <View style={{ alignItems: 'center' }}>
+      <View style={{ width: 12, height: 4, backgroundColor: c, borderTopLeftRadius: 2, borderTopRightRadius: 2 }} />
+      <View style={{ width: 8, height: 3, backgroundColor: c }} />
+      <View style={{ width: 6, height: 10, backgroundColor: c, borderBottomLeftRadius: 1.5, borderBottomRightRadius: 1.5 }} />
+    </View>
+  );
+}
+
+// ─── MiddleControls ────────────────────────────────────────────────────────
 
 interface QuickControlsProps {
   colWidth: number;
@@ -22,129 +114,83 @@ interface QuickControlsProps {
 }
 
 export function MiddleControls({
-  colWidth,
-  twoColWidth,
-  torchOn,
-  onToggleTorch,
-  onLaunchCalculator,
-  onLaunchCamera,
-  onLaunchBattery,
+  colWidth, twoColWidth, torchOn, onToggleTorch,
+  onLaunchCalculator, onLaunchCamera, onLaunchBattery,
 }: QuickControlsProps) {
   const [orientationLocked, setOrientationLocked] = useState(false);
   const [silentActive, setSilentActive] = useState(false);
   const [dndActive, setDndActive] = useState(false);
   const [screenRecording, setScreenRecording] = useState(false);
 
-  // Circle button diameter
-  const circleDiameter = Math.min(colWidth, 54);
+  const D = Math.min(colWidth, 54);
 
   return (
-    <View style={[styles.middleColContainer, { width: twoColWidth }]}>
-      {/* Row 1: Orientation Lock + Silent Mode */}
-      <View style={styles.twoBtnRow}>
+    <View style={[styles.middleCol, { width: twoColWidth }]}>
+
+      {/* Row 1: Orientation + Bell */}
+      <View style={styles.twoRow}>
         <TouchableOpacity
-          style={[
-            styles.circleCard,
-            { width: circleDiameter, height: circleDiameter, borderRadius: circleDiameter / 2 },
-            orientationLocked && styles.circleCardActive,
-          ]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            setOrientationLocked(!orientationLocked);
-          }}
+          style={[styles.circle, { width: D, height: D, borderRadius: D / 2 },
+            orientationLocked && styles.circleYellow]}
+          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setOrientationLocked(!orientationLocked); }}
           activeOpacity={0.75}
         >
-          <Text style={[styles.lockGlyph, orientationLocked && styles.lockGlyphActive]}>
-            🔒
-          </Text>
+          <LockRotateIcon locked={orientationLocked} />
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.circleCard,
-            { width: circleDiameter, height: circleDiameter, borderRadius: circleDiameter / 2 },
-            silentActive && styles.circleCardRedActive,
-          ]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            setSilentActive(!silentActive);
-          }}
+          style={[styles.circle, { width: D, height: D, borderRadius: D / 2 },
+            silentActive && styles.circleRed]}
+          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setSilentActive(!silentActive); }}
           activeOpacity={0.75}
         >
-          <Text style={styles.bellGlyph}>{silentActive ? '🔕' : '🔔'}</Text>
+          <BellIcon muted={silentActive} />
         </TouchableOpacity>
       </View>
 
-      {/* Row 2: Focus Pill (iOS 18 style) */}
+      {/* Row 2: Focus Pill */}
       <TouchableOpacity
-        style={[
-          styles.dndPill,
-          { width: twoColWidth },
-          dndActive && styles.dndPillActive,
-        ]}
-        onPress={() => {
-          LauncherBridge?.triggerHaptic?.('click');
-          setDndActive(!dndActive);
-        }}
+        style={[styles.focusPill, { width: twoColWidth }, dndActive && styles.focusPillActive]}
+        onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setDndActive(!dndActive); }}
         activeOpacity={0.75}
       >
-        <View style={styles.focusPillContent}>
-          <Text style={[styles.dndMoon, dndActive && styles.dndMoonActive]}>🌙</Text>
-          <Text style={[styles.dndTitle, dndActive && styles.dndTitleActive]}>
-            Focus
-          </Text>
+        <View style={styles.focusInner}>
+          {/* Moon crescent drawn with Views */}
+          <View style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: '#fff',
+            borderRightColor: 'transparent', transform: [{ rotate: '150deg' }] }} />
+          <Text style={styles.focusLabel}> Focus</Text>
         </View>
       </TouchableOpacity>
 
-      {/* Row 3: 4 Circle Action Buttons (Torch, Screen Record, Screen Mirror, Battery) */}
-      <View style={styles.fourCirclesRow}>
-        {/* Torch / Flashlight */}
-        <TouchableOpacity
-          style={[
-            styles.miniCircle,
-            torchOn && styles.torchActive,
-          ]}
-          onPress={onToggleTorch}
-          activeOpacity={0.75}
-        >
-          <FlashlightIcon active={torchOn} size={18} />
+      {/* Row 3: 4 mini circles */}
+      <View style={styles.miniRow}>
+        <TouchableOpacity style={[styles.mini, torchOn && styles.miniWhite]} onPress={onToggleTorch} activeOpacity={0.75}>
+          <TorchIcon on={torchOn} />
         </TouchableOpacity>
 
-        {/* Screen Record */}
         <TouchableOpacity
-          style={[
-            styles.miniCircle,
-            screenRecording && styles.recordActive,
-          ]}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            setScreenRecording(!screenRecording);
-          }}
+          style={[styles.mini, screenRecording && styles.miniRed]}
+          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setScreenRecording(!screenRecording); }}
           activeOpacity={0.75}
         >
-          <ScreenRecordIcon active={screenRecording} size={18} />
+          <ScreenRecordIcon active={screenRecording} size={16} />
         </TouchableOpacity>
 
-        {/* Screen Mirroring */}
         <TouchableOpacity
-          style={styles.miniCircle}
-          onPress={() => {
-            LauncherBridge?.triggerHaptic?.('click');
-            Alert.alert('Screen Mirroring', 'Searching for AirPlay / Cast displays...');
-          }}
+          style={styles.mini}
+          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); Alert.alert('Screen Mirror', 'Searching for displays...'); }}
           activeOpacity={0.75}
         >
-          <ScreenMirrorIcon size={18} />
+          <ScreenMirrorIcon size={16} />
         </TouchableOpacity>
 
-        {/* Low Power Mode / Battery */}
-        <TouchableOpacity
-          style={styles.miniCircle}
-          onPress={onLaunchBattery}
-          activeOpacity={0.75}
-        >
-          <View style={styles.batteryIconShell}>
-            <View style={styles.batteryIconFill} />
+        <TouchableOpacity style={styles.mini} onPress={onLaunchBattery} activeOpacity={0.75}>
+          {/* Battery icon */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ width: 18, height: 9, borderRadius: 2, borderWidth: 1.5, borderColor: '#FFD60A', justifyContent: 'center', paddingHorizontal: 1.5 }}>
+              <View style={{ width: '60%', height: 5, backgroundColor: '#FFD60A', borderRadius: 1 }} />
+            </View>
+            <View style={{ width: 2, height: 5, backgroundColor: '#FFD60A', borderRadius: 1, marginLeft: 1 }} />
           </View>
         </TouchableOpacity>
       </View>
@@ -152,205 +198,86 @@ export function MiddleControls({
   );
 }
 
+// ─── BottomPillsRow ────────────────────────────────────────────────────────
+
 interface BottomPillsProps {
   twoColWidth: number;
+  colWidth: number;
   onClose: () => void;
 }
 
-export function BottomPillsRow({ twoColWidth, onClose }: BottomPillsProps) {
-  // We'll use the twoColWidth/2 for column layout or just fixed widths.
-  // The iOS grid usually has 4 columns per row.
-  const gap = 12;
-  const itemSize = 62; // Circular item size
+export function BottomPillsRow({ twoColWidth, colWidth, onClose }: BottomPillsProps) {
+  const S = colWidth;
+  const iconSz = Math.floor(S * 0.42);
+
+  type Item = { icon: ReactElement; bg: string; onPress: () => void };
+
+  const items: Item[] = [
+    { icon: <TorchIcon />, bg: 'rgba(255,255,255,0.13)',
+      onPress: () => LauncherBridge?.triggerHaptic?.('click') },
+    { icon: <StopwatchIcon size={iconSz} />, bg: 'rgba(255,255,255,0.13)',
+      onPress: () => LauncherBridge?.triggerHaptic?.('click') },
+    { icon: <CalculatorIcon />, bg: 'rgba(255,255,255,0.13)',
+      onPress: () => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp?.('com.android.calculator2'); onClose(); } },
+    { icon: <CameraIcon />, bg: 'rgba(255,255,255,0.13)',
+      onPress: () => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp?.('com.android.camera2'); onClose(); } },
+    { icon: <ScreenRecordIcon active={false} size={iconSz} />, bg: 'rgba(255,255,255,0.13)',
+      onPress: () => LauncherBridge?.triggerHaptic?.('click') },
+    { icon: <WaveformIcon size={iconSz} />, bg: 'rgba(255,255,255,0.13)',
+      onPress: () => LauncherBridge?.triggerHaptic?.('click') },
+    { icon: <ScreenMirrorIcon size={iconSz} />, bg: 'rgba(255,255,255,0.13)',
+      onPress: () => LauncherBridge?.triggerHaptic?.('click') },
+    { icon: <ShazamIcon size={iconSz} />, bg: '#007AFF',
+      onPress: () => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp?.('com.shazam.android'); onClose(); } },
+  ];
+
+  const rows: Item[][] = [items.slice(0, 4), items.slice(4, 8)];
 
   return (
-    <View style={styles.bottomPillsWrapper}>
-      {/* Row 1 */}
-      <View style={styles.circularGridRow}>
-        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
-          <FlashlightIcon active={false} size={22} />
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
-          <StopwatchIcon size={22} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp('com.android.calculator2'); onClose(); }}>
-          <Text style={styles.emojiIcon}>🧮</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp('com.android.camera2'); onClose(); }}>
-          <Text style={styles.emojiIcon}>📷</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Row 2 */}
-      <View style={styles.circularGridRow}>
-        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
-          <ScreenRecordIcon active={false} size={22} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
-          <WaveformIcon size={22} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
-          <ScreenMirrorIcon size={22} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.gridCircle} activeOpacity={0.7} onPress={() => LauncherBridge?.triggerHaptic?.('click')}>
-          <ShazamIcon size={22} />
-        </TouchableOpacity>
-      </View>
+    <View style={styles.bottomWrapper}>
+      {rows.map((row, ri) => (
+        <View key={ri} style={styles.gridRow}>
+          {row.map((item, ci) => (
+            <TouchableOpacity
+              key={ci}
+              style={[styles.gridCircle, { width: S, height: S, borderRadius: S / 2, backgroundColor: item.bg }]}
+              onPress={item.onPress}
+              activeOpacity={0.7}
+            >
+              {item.icon}
+            </TouchableOpacity>
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
 
+// ─── Styles ────────────────────────────────────────────────────────────────
+
+const GLASS = 'rgba(255, 255, 255, 0.13)';
+const GLASS_BORDER = 'rgba(255, 255, 255, 0.22)';
+
 const styles = StyleSheet.create({
-  middleColContainer: {
-    height: 180,
-    justifyContent: 'space-between',
+  middleCol: { gap: 10, alignItems: 'flex-start' },
+  twoRow: { flexDirection: 'row', gap: 12 },
+  circle: { backgroundColor: GLASS, borderWidth: 0.5, borderColor: GLASS_BORDER, justifyContent: 'center', alignItems: 'center' },
+  circleYellow: { backgroundColor: '#FFD60A', borderColor: '#FFD60A' },
+  circleRed: { backgroundColor: '#FF3B30', borderColor: '#FF3B30' },
+  focusPill: {
+    height: 44, borderRadius: 22,
+    backgroundColor: GLASS,
+    borderWidth: 0.5, borderColor: GLASS_BORDER,
+    justifyContent: 'center', paddingHorizontal: 16,
   },
-  twoBtnRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  circleCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderWidth: 0.8,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  circleCardActive: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
-  },
-  circleCardRedActive: {
-    backgroundColor: '#FF3B30',
-    borderColor: '#FF453A',
-  },
-  lockGlyph: {
-    fontSize: 18,
-    color: '#ffffff',
-  },
-  lockGlyphActive: {
-    color: '#121216',
-  },
-  bellGlyph: {
-    fontSize: 18,
-  },
-  dndPill: {
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderWidth: 0.8,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-  },
-  dndPillActive: {
-    backgroundColor: '#5856D6',
-    borderColor: '#7A79E8',
-  },
-  focusPillContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  dndMoon: {
-    fontSize: 16,
-    marginRight: 6,
-  },
-  dndMoonActive: {
-    color: '#ffffff',
-  },
-  dndTextContainer: {
-    justifyContent: 'center',
-  },
-  dndTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#ffffff',
-  },
-  dndTitleActive: {
-    color: '#ffffff',
-  },
-  dndSubtitle: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.55)',
-  },
-  dndSubtitleActive: {
-    color: 'rgba(255, 255, 255, 0.85)',
-  },
-  fourCirclesRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  miniCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderWidth: 0.8,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  torchActive: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
-    shadowColor: '#FFD60A',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.9,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  recordActive: {
-    backgroundColor: 'rgba(255, 59, 48, 0.25)',
-    borderColor: '#FF3B30',
-  },
-  batteryIconShell: {
-    width: 18,
-    height: 10,
-    borderRadius: 2.5,
-    borderWidth: 1.2,
-    borderColor: '#ffffff',
-    padding: 1,
-    justifyContent: 'center',
-  },
-  batteryIconFill: {
-    width: '60%',
-    height: '100%',
-    backgroundColor: '#FFD60A',
-    borderRadius: 1,
-  },
-  bottomPillsWrapper: {
-    marginTop: 16,
-    gap: 16,
-    paddingHorizontal: 6,
-  },
-  circularGridRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  gridCircle: {
-    width: 66,
-    height: 66,
-    borderRadius: 33,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderWidth: 0.8,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emojiIcon: {
-    fontSize: 22,
-  },
+  focusPillActive: { backgroundColor: '#5856D6', borderColor: '#7A79E8' },
+  focusInner: { flexDirection: 'row', alignItems: 'center' },
+  focusLabel: { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.9)', marginLeft: 8 },
+  miniRow: { flexDirection: 'row', gap: 8 },
+  mini: { width: 38, height: 38, borderRadius: 19, backgroundColor: GLASS, borderWidth: 0.5, borderColor: GLASS_BORDER, justifyContent: 'center', alignItems: 'center' },
+  miniWhite: { backgroundColor: '#ffffff', borderColor: '#ffffff' },
+  miniRed: { backgroundColor: 'rgba(255,59,48,0.2)', borderColor: '#FF3B30' },
+  bottomWrapper: { marginTop: 12, gap: 12 },
+  gridRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  gridCircle: { justifyContent: 'center', alignItems: 'center', borderWidth: 0.5, borderColor: GLASS_BORDER },
 });

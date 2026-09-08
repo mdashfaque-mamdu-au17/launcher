@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from '@react-native-community/blur';
 import { ControlCenterProps } from '../../types/launcher';
 import { width, height } from '../../constants/layout';
 import { LauncherBridge } from '../../services/LauncherBridge';
@@ -208,13 +209,13 @@ export function ControlCenterOverlay({
   return (
     <View style={[StyleSheet.absoluteFill, styles.rootOverlay]} pointerEvents="box-none">
       {/* 100% Full-Screen Immersive Frosted Blur Backdrop */}
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          styles.fullScreenBackdrop,
-          { opacity: fadeAnim },
-        ]}
-      >
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity: fadeAnim }]}>
+        <BlurView
+          style={StyleSheet.absoluteFill}
+          blurType="dark"
+          blurAmount={25}
+          reducedTransparencyFallbackColor="black"
+        />
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
@@ -292,7 +293,7 @@ export function ControlCenterOverlay({
           </View>
 
           {/* Row 3: Smart Utility & Action Pills */}
-          <BottomPillsRow twoColWidth={twoColWidth} onClose={onClose} />
+          <BottomPillsRow twoColWidth={twoColWidth} colWidth={colWidth} onClose={onClose} />
         </ScrollView>
 
         {/* Authentic iOS Bottom Grabber Bar */}
@@ -308,11 +309,7 @@ const styles = StyleSheet.create({
   rootOverlay: {
     zIndex: 99999,
   },
-  fullScreenBackdrop: {
-    backgroundColor: 'rgba(10, 10, 20, 0.88)',
-  },
   controlCenterCanvas: {
-    backgroundColor: 'rgba(18, 18, 30, 0.55)',
     paddingHorizontal: 16,
     justifyContent: 'space-between',
   },

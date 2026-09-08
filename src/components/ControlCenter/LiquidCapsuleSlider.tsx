@@ -85,7 +85,7 @@ export function LiquidCapsuleSlider({
   ).current;
 
   const fillPercent = Math.max(0, Math.min(100, Math.round(value * 100)));
-  const isHigh = fillPercent > 50;
+  const isHigh = fillPercent > 20;
 
   return (
     <Animated.View
@@ -156,10 +156,9 @@ const styles = StyleSheet.create({
   },
   centerIconContainer: {
     position: 'absolute',
-    top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
