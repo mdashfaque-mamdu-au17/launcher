@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { LauncherBridge } from '../../services/LauncherBridge';
 
 interface ConnectivityPlatterProps {
@@ -65,7 +66,14 @@ export function ConnectivityPlatter({ size }: ConnectivityPlatterProps) {
   const iconSize = Math.floor(btnSize * 0.42);
 
   return (
-    <View style={[styles.platterCard, { width: size, height: size }]}>
+    <LinearGradient
+      colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.05)']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={[styles.platterCard, { width: size, height: size }]}
+    >
+      {/* Specular highlight */}
+      <View style={styles.specularHighlight} />
       <View style={styles.gridContainer}>
         {/* Airplane */}
         <TouchableOpacity
@@ -107,19 +115,27 @@ export function ConnectivityPlatter({ size }: ConnectivityPlatterProps) {
           <BluetoothIcon size={iconSize * 1.1} color="#fff" />
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   platterCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.13)',
     borderRadius: 32,
     borderWidth: 0.5,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     padding: 14,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  specularHighlight: {
+    position: 'absolute',
+    top: 0,
+    left: '10%',
+    right: '10%',
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
   gridContainer: {
     width: '100%',
@@ -133,7 +149,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  btnInactive: { backgroundColor: 'rgba(255, 255, 255, 0.13)' },
+  btnInactive: { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
   btnBlue: { backgroundColor: '#007AFF' },
   btnGreen: { backgroundColor: '#34C759' },
   btnOrange: { backgroundColor: '#FF9500' },

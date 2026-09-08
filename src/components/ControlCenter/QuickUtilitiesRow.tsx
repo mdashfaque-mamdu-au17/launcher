@@ -1,6 +1,19 @@
 import React, { useState, ReactElement } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { LauncherBridge } from '../../services/LauncherBridge';
+
+function GlassBackground({ borderRadius }: { borderRadius: number }) {
+  return (
+    <LinearGradient
+      colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.05)']}
+      start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      style={[StyleSheet.absoluteFill, { borderRadius, overflow: 'hidden' }]}
+    >
+      <View style={{ position: 'absolute', top: 0, left: '10%', right: '10%', height: 1, backgroundColor: 'rgba(255, 255, 255, 0.5)' }} />
+    </LinearGradient>
+  );
+}
 import {
   FlashlightIcon,
   ScreenRecordIcon,
@@ -135,6 +148,7 @@ export function MiddleControls({
           onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setOrientationLocked(!orientationLocked); }}
           activeOpacity={0.75}
         >
+          {!orientationLocked && <GlassBackground borderRadius={D / 2} />}
           <LockRotateIcon locked={orientationLocked} />
         </TouchableOpacity>
 
@@ -144,6 +158,7 @@ export function MiddleControls({
           onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setSilentActive(!silentActive); }}
           activeOpacity={0.75}
         >
+          {!silentActive && <GlassBackground borderRadius={D / 2} />}
           <BellIcon muted={silentActive} />
         </TouchableOpacity>
       </View>
@@ -154,6 +169,7 @@ export function MiddleControls({
         onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setDndActive(!dndActive); }}
         activeOpacity={0.75}
       >
+        {!dndActive && <GlassBackground borderRadius={22} />}
         <View style={styles.focusInner}>
           {/* Moon crescent drawn with Views */}
           <View style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: '#fff',
@@ -165,6 +181,7 @@ export function MiddleControls({
       {/* Row 3: 4 mini circles */}
       <View style={styles.miniRow}>
         <TouchableOpacity style={[styles.mini, torchOn && styles.miniWhite]} onPress={onToggleTorch} activeOpacity={0.75}>
+          {!torchOn && <GlassBackground borderRadius={19} />}
           <TorchIcon on={torchOn} />
         </TouchableOpacity>
 
@@ -173,6 +190,7 @@ export function MiddleControls({
           onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setScreenRecording(!screenRecording); }}
           activeOpacity={0.75}
         >
+          {!screenRecording && <GlassBackground borderRadius={19} />}
           <ScreenRecordIcon active={screenRecording} size={16} />
         </TouchableOpacity>
 
@@ -181,10 +199,12 @@ export function MiddleControls({
           onPress={() => { LauncherBridge?.triggerHaptic?.('click'); Alert.alert('Screen Mirror', 'Searching for displays...'); }}
           activeOpacity={0.75}
         >
+          <GlassBackground borderRadius={19} />
           <ScreenMirrorIcon size={16} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.mini} onPress={onLaunchBattery} activeOpacity={0.75}>
+          <GlassBackground borderRadius={19} />
           {/* Battery icon */}
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View style={{ width: 18, height: 9, borderRadius: 2, borderWidth: 1.5, borderColor: '#FFD60A', justifyContent: 'center', paddingHorizontal: 1.5 }}>
@@ -213,19 +233,19 @@ export function BottomPillsRow({ twoColWidth, colWidth, onClose }: BottomPillsPr
   type Item = { icon: ReactElement; bg: string; onPress: () => void };
 
   const items: Item[] = [
-    { icon: <TorchIcon />, bg: 'rgba(255,255,255,0.13)',
+    { icon: <TorchIcon />, bg: 'glass',
       onPress: () => LauncherBridge?.triggerHaptic?.('click') },
-    { icon: <StopwatchIcon size={iconSz} />, bg: 'rgba(255,255,255,0.13)',
+    { icon: <StopwatchIcon size={iconSz} />, bg: 'glass',
       onPress: () => LauncherBridge?.triggerHaptic?.('click') },
-    { icon: <CalculatorIcon />, bg: 'rgba(255,255,255,0.13)',
+    { icon: <CalculatorIcon />, bg: 'glass',
       onPress: () => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp?.('com.android.calculator2'); onClose(); } },
-    { icon: <CameraIcon />, bg: 'rgba(255,255,255,0.13)',
+    { icon: <CameraIcon />, bg: 'glass',
       onPress: () => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp?.('com.android.camera2'); onClose(); } },
-    { icon: <ScreenRecordIcon active={false} size={iconSz} />, bg: 'rgba(255,255,255,0.13)',
+    { icon: <ScreenRecordIcon active={false} size={iconSz} />, bg: 'glass',
       onPress: () => LauncherBridge?.triggerHaptic?.('click') },
-    { icon: <WaveformIcon size={iconSz} />, bg: 'rgba(255,255,255,0.13)',
+    { icon: <WaveformIcon size={iconSz} />, bg: 'glass',
       onPress: () => LauncherBridge?.triggerHaptic?.('click') },
-    { icon: <ScreenMirrorIcon size={iconSz} />, bg: 'rgba(255,255,255,0.13)',
+    { icon: <ScreenMirrorIcon size={iconSz} />, bg: 'glass',
       onPress: () => LauncherBridge?.triggerHaptic?.('click') },
     { icon: <ShazamIcon size={iconSz} />, bg: '#007AFF',
       onPress: () => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.launchApp?.('com.shazam.android'); onClose(); } },
@@ -240,10 +260,11 @@ export function BottomPillsRow({ twoColWidth, colWidth, onClose }: BottomPillsPr
           {row.map((item, ci) => (
             <TouchableOpacity
               key={ci}
-              style={[styles.gridCircle, { width: S, height: S, borderRadius: S / 2, backgroundColor: item.bg }]}
+              style={[styles.gridCircle, { width: S, height: S, borderRadius: S / 2, backgroundColor: item.bg === 'glass' ? 'transparent' : item.bg }]}
               onPress={item.onPress}
               activeOpacity={0.7}
             >
+              {item.bg === 'glass' && <GlassBackground borderRadius={S / 2} />}
               {item.icon}
             </TouchableOpacity>
           ))}
@@ -255,18 +276,17 @@ export function BottomPillsRow({ twoColWidth, colWidth, onClose }: BottomPillsPr
 
 // ─── Styles ────────────────────────────────────────────────────────────────
 
-const GLASS = 'rgba(255, 255, 255, 0.13)';
-const GLASS_BORDER = 'rgba(255, 255, 255, 0.22)';
+const GLASS_BORDER = 'rgba(255, 255, 255, 0.15)';
 
 const styles = StyleSheet.create({
   middleCol: { gap: 10, alignItems: 'flex-start' },
   twoRow: { flexDirection: 'row', gap: 12 },
-  circle: { backgroundColor: GLASS, borderWidth: 0.5, borderColor: GLASS_BORDER, justifyContent: 'center', alignItems: 'center' },
+  circle: { backgroundColor: 'transparent', borderWidth: 0.5, borderColor: GLASS_BORDER, justifyContent: 'center', alignItems: 'center' },
   circleYellow: { backgroundColor: '#FFD60A', borderColor: '#FFD60A' },
   circleRed: { backgroundColor: '#FF3B30', borderColor: '#FF3B30' },
   focusPill: {
     height: 44, borderRadius: 22,
-    backgroundColor: GLASS,
+    backgroundColor: 'transparent',
     borderWidth: 0.5, borderColor: GLASS_BORDER,
     justifyContent: 'center', paddingHorizontal: 16,
   },
@@ -274,7 +294,7 @@ const styles = StyleSheet.create({
   focusInner: { flexDirection: 'row', alignItems: 'center' },
   focusLabel: { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.9)', marginLeft: 8 },
   miniRow: { flexDirection: 'row', gap: 8 },
-  mini: { width: 38, height: 38, borderRadius: 19, backgroundColor: GLASS, borderWidth: 0.5, borderColor: GLASS_BORDER, justifyContent: 'center', alignItems: 'center' },
+  mini: { width: 38, height: 38, borderRadius: 19, backgroundColor: 'transparent', borderWidth: 0.5, borderColor: GLASS_BORDER, justifyContent: 'center', alignItems: 'center' },
   miniWhite: { backgroundColor: '#ffffff', borderColor: '#ffffff' },
   miniRed: { backgroundColor: 'rgba(255,59,48,0.2)', borderColor: '#FF3B30' },
   bottomWrapper: { marginTop: 12, gap: 12 },

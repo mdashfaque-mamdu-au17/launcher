@@ -5,6 +5,7 @@ import {
   Animated,
   PanResponder,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { LauncherBridge } from '../../services/LauncherBridge';
 import { SunGlyph, SpeakerGlyph } from './CCIcons';
 
@@ -99,6 +100,13 @@ export function LiquidCapsuleSlider({
       ]}
       {...panResponder.panHandlers}
     >
+      {/* Glass gradient background */}
+      <LinearGradient
+        colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.05)']}
+        start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+
       {/* Liquid white glass fill level */}
       <View
         style={[
@@ -126,7 +134,6 @@ export function LiquidCapsuleSlider({
 
 const styles = StyleSheet.create({
   capsuleWrapper: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     borderRadius: 36,
     borderWidth: 0.8,
     borderColor: 'rgba(255, 255, 255, 0.22)',

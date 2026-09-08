@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 interface MediaPlayerProps {
   size: number;
@@ -17,7 +18,13 @@ export function MediaPlayerPlatter({
   onPrev,
 }: MediaPlayerProps) {
   return (
-    <View style={[styles.platterCard, { width: size, height: size }]}>
+    <LinearGradient
+      colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.05)']}
+      start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+      style={[styles.platterCard, { width: size, height: size }]}
+    >
+      {/* Specular highlight */}
+      <View style={styles.specularHighlight} pointerEvents="none" />
       {/* Top: Album Art Thumbnail & AirPlay glyph */}
       <View style={styles.topRow}>
         <View style={styles.albumArtSquare}>
@@ -64,18 +71,26 @@ export function MediaPlayerPlatter({
           <Text style={styles.transportIcon}>⏭</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   platterCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     borderRadius: 36,
     borderWidth: 0.8,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     padding: 16,
     justifyContent: 'space-between',
+    overflow: 'hidden',
+  },
+  specularHighlight: {
+    position: 'absolute',
+    top: 0,
+    left: '10%',
+    right: '10%',
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
   topRow: {
     flexDirection: 'row',
