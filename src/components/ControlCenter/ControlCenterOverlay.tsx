@@ -213,9 +213,11 @@ export function ControlCenterOverlay({
         <BlurView
           style={StyleSheet.absoluteFill}
           blurType="dark"
-          blurAmount={25}
+          blurAmount={32}
           reducedTransparencyFallbackColor="black"
         />
+        {/* Darkening overlay to ensure high contrast against wallpaper */}
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0, 0, 0, 0.3)' }]} pointerEvents="none" />
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>

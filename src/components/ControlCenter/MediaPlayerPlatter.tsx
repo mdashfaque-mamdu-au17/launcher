@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { Music, Play, Pause, FastForward, Rewind, Airplay } from 'lucide-react-native';
 
 interface MediaPlayerProps {
   size: number;
@@ -19,19 +20,17 @@ export function MediaPlayerPlatter({
 }: MediaPlayerProps) {
   return (
     <LinearGradient
-      colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.05)']}
+      colors={['rgba(45, 45, 50, 0.65)', 'rgba(25, 25, 30, 0.65)']}
       start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
       style={[styles.platterCard, { width: size, height: size }]}
     >
-      {/* Specular highlight */}
-      <View style={styles.specularHighlight} pointerEvents="none" />
       {/* Top: Album Art Thumbnail & AirPlay glyph */}
       <View style={styles.topRow}>
         <View style={styles.albumArtSquare}>
-          <Text style={styles.albumArtIcon}>🎵</Text>
+          <Music size={20} color="rgba(255,255,255,0.8)" strokeWidth={2.5} />
         </View>
         <View style={styles.airplayPill}>
-          <Text style={styles.airplayGlyph}>▲</Text>
+          <Airplay size={14} color="rgba(255,255,255,0.7)" strokeWidth={2.5} />
         </View>
       </View>
 
@@ -52,7 +51,7 @@ export function MediaPlayerPlatter({
           onPress={onPrev}
           activeOpacity={0.7}
         >
-          <Text style={styles.transportIcon}>⏮</Text>
+          <Rewind size={20} color="#ffffff" fill="#ffffff" strokeWidth={0} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -60,7 +59,11 @@ export function MediaPlayerPlatter({
           onPress={onPlayPause}
           activeOpacity={0.7}
         >
-          <Text style={styles.playPauseIcon}>{isPlaying ? '❚❚' : '▶'}</Text>
+          {isPlaying ? (
+            <Pause size={24} color="#ffffff" fill="#ffffff" strokeWidth={0} />
+          ) : (
+            <Play size={24} color="#ffffff" fill="#ffffff" strokeWidth={0} />
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -68,7 +71,7 @@ export function MediaPlayerPlatter({
           onPress={onNext}
           activeOpacity={0.7}
         >
-          <Text style={styles.transportIcon}>⏭</Text>
+          <FastForward size={20} color="#ffffff" fill="#ffffff" strokeWidth={0} />
         </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -78,19 +81,14 @@ export function MediaPlayerPlatter({
 const styles = StyleSheet.create({
   platterCard: {
     borderRadius: 36,
-    borderWidth: 0.8,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.3)',
+    borderLeftColor: 'rgba(255, 255, 255, 0.12)',
+    borderRightColor: 'rgba(255, 255, 255, 0.12)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.12)',
     padding: 16,
     justifyContent: 'space-between',
     overflow: 'hidden',
-  },
-  specularHighlight: {
-    position: 'absolute',
-    top: 0,
-    left: '10%',
-    right: '10%',
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
   topRow: {
     flexDirection: 'row',
@@ -98,12 +96,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   albumArtSquare: {
-    width: 38,
-    height: 38,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     borderWidth: 0.6,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -114,7 +112,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
   },

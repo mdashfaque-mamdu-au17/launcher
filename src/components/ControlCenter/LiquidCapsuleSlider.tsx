@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { LauncherBridge } from '../../services/LauncherBridge';
-import { SunGlyph, SpeakerGlyph } from './CCIcons';
+import { Sun, Volume2 } from 'lucide-react-native';
 
 interface LiquidCapsuleSliderProps {
   type: 'brightness' | 'volume';
@@ -102,7 +102,7 @@ export function LiquidCapsuleSlider({
     >
       {/* Glass gradient background */}
       <LinearGradient
-        colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.05)']}
+        colors={['rgba(45, 45, 50, 0.65)', 'rgba(25, 25, 30, 0.65)']}
         start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
@@ -113,19 +113,16 @@ export function LiquidCapsuleSlider({
           styles.capsuleFill,
           {
             height: `${fillPercent}%`,
-          },
+          }
         ]}
       />
-
-      {/* Top subtle specular edge */}
-      <View style={styles.specularHighlight} pointerEvents="none" />
 
       {/* Center Icon */}
       <View style={styles.centerIconContainer} pointerEvents="none">
         {type === 'brightness' ? (
-          <SunGlyph size={26} dark={isHigh} />
+          <Sun size={24} color={fillPercent > 50 ? '#14151b' : '#ffffff'} strokeWidth={2.5} />
         ) : (
-          <SpeakerGlyph size={24} dark={isHigh} volume={value} />
+          <Volume2 size={24} color={fillPercent > 50 ? '#14151b' : '#ffffff'} strokeWidth={2.5} />
         )}
       </View>
     </Animated.View>
@@ -135,8 +132,11 @@ export function LiquidCapsuleSlider({
 const styles = StyleSheet.create({
   capsuleWrapper: {
     borderRadius: 36,
-    borderWidth: 0.8,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
+    borderWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.3)',
+    borderLeftColor: 'rgba(255, 255, 255, 0.12)',
+    borderRightColor: 'rgba(255, 255, 255, 0.12)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.12)',
     overflow: 'hidden',
     position: 'relative',
     justifyContent: 'flex-end',
@@ -150,16 +150,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderBottomLeftRadius: 36,
     borderBottomRightRadius: 36,
-  },
-  specularHighlight: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 36,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderTopLeftRadius: 36,
-    borderTopRightRadius: 36,
   },
   centerIconContainer: {
     position: 'absolute',

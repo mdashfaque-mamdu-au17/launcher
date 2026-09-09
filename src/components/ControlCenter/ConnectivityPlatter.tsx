@@ -1,118 +1,69 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { LauncherBridge } from '../../services/LauncherBridge';
+import { Plane, Wifi, Bluetooth, Antenna, ArrowUpFromLine, Radio } from 'lucide-react-native';
 
 interface ConnectivityPlatterProps {
   size: number;
 }
 
-// Pure View-drawn WiFi icon (3 arcs)
-function WifiIcon({ color = '#fff', size = 22 }: { color?: string; size?: number }) {
-  const s = size;
-  return (
-    <View style={{ width: s, height: s * 0.75, alignItems: 'center', justifyContent: 'flex-end' }}>
-      <View style={{ width: s * 0.18, height: s * 0.18, borderRadius: s * 0.09, backgroundColor: color }} />
-      <View style={{ position: 'absolute', bottom: s * 0.18, width: s * 0.52, height: s * 0.26,
-        borderTopLeftRadius: s * 0.26, borderTopRightRadius: s * 0.26,
-        borderWidth: 2.2, borderColor: color, borderBottomWidth: 0, backgroundColor: 'transparent' }} />
-      <View style={{ position: 'absolute', bottom: s * 0.18, width: s * 0.78, height: s * 0.39,
-        borderTopLeftRadius: s * 0.39, borderTopRightRadius: s * 0.39,
-        borderWidth: 2.2, borderColor: color, borderBottomWidth: 0, backgroundColor: 'transparent' }} />
-      <View style={{ position: 'absolute', bottom: s * 0.18, width: s, height: s * 0.5,
-        borderTopLeftRadius: s * 0.5, borderTopRightRadius: s * 0.5,
-        borderWidth: 2.2, borderColor: color, borderBottomWidth: 0, backgroundColor: 'transparent' }} />
-    </View>
-  );
-}
-
-// Pure View-drawn Bluetooth "B" glyph
-function BluetoothIcon({ color = '#fff', size = 22 }: { color?: string; size?: number }) {
-  return (
-    <Text style={{ fontSize: size * 0.95, color, fontWeight: '700', fontStyle: 'italic', letterSpacing: -1 }}>
-      ᛒ
-    </Text>
-  );
-}
-
-// Airplane icon using text
-function AirplaneIcon({ color = '#fff', size = 22 }: { color?: string; size?: number }) {
-  return <Text style={{ fontSize: size, color }}>✈</Text>;
-}
-
-// Cell signal bars
-function CellularIcon({ color = '#fff', size = 22 }: { color?: string; size?: number }) {
-  const barW = size * 0.18;
-  const gap = size * 0.1;
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'flex-end', width: size, height: size * 0.7 }}>
-      {[0.35, 0.55, 0.75, 1.0].map((h, i) => (
-        <View key={i} style={{
-          width: barW, height: size * h * 0.65, backgroundColor: color,
-          borderRadius: 2, marginLeft: i === 0 ? 0 : gap,
-        }} />
-      ))}
-    </View>
-  );
-}
-
 export function ConnectivityPlatter({ size }: ConnectivityPlatterProps) {
-  const [airplaneActive, setAirplaneActive] = useState(false);
-  const [cellularActive, setCellularActive] = useState(true);
-  const [wifiActive, setWifiActive] = useState(true);
-  const [btActive, setBtActive] = useState(true);
+  const [isAirplaneOn, setAirplaneOn] = useState(false);
 
   const btnSize = Math.floor((size - 28 - 12) / 2);
   const iconSize = Math.floor(btnSize * 0.42);
 
   return (
     <LinearGradient
-      colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.05)']}
+      colors={['rgba(45, 45, 50, 0.65)', 'rgba(25, 25, 30, 0.65)']}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       style={[styles.platterCard, { width: size, height: size }]}
     >
-      {/* Specular highlight */}
-      <View style={styles.specularHighlight} />
       <View style={styles.gridContainer}>
         {/* Airplane */}
         <TouchableOpacity
-          style={[styles.circleButton, { width: btnSize, height: btnSize, borderRadius: btnSize / 2 },
-            airplaneActive ? styles.btnOrange : styles.btnInactive]}
-          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setAirplaneActive(!airplaneActive); }}
-          activeOpacity={0.75}
+          style={[styles.quadrantBtn, { backgroundColor: isAirplaneOn ? '#FF9500' : 'rgba(0, 0, 0, 0.25)' }]}
+          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setAirplaneOn(!isAirplaneOn); }}
+          activeOpacity={0.7}
         >
-          <AirplaneIcon size={iconSize * 1.1} color="#fff" />
+          <Plane size={iconSize} color="#ffffff" strokeWidth={2.5} />
         </TouchableOpacity>
 
         {/* Cellular */}
         <TouchableOpacity
-          style={[styles.circleButton, { width: btnSize, height: btnSize, borderRadius: btnSize / 2 },
-            cellularActive ? styles.btnGreen : styles.btnInactive]}
-          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setCellularActive(!cellularActive); }}
-          activeOpacity={0.75}
+          style={[styles.quadrantBtn, { backgroundColor: '#34C759' }]}
+          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.openSystemSettings?.('network'); }}
+          activeOpacity={0.7}
         >
-          <CellularIcon size={iconSize} color="#fff" />
+          <Antenna size={iconSize * 1.1} color="#ffffff" strokeWidth={2.5} />
         </TouchableOpacity>
+
+        {/* Inner small bubbles (AirDrop & Hotspot) */}
+        <View style={styles.centerSmallBubble1} pointerEvents="none">
+           <Radio size={8} color="rgba(255,255,255,0.7)" strokeWidth={3} />
+        </View>
+        <View style={styles.centerSmallBubble2} pointerEvents="none">
+           <ArrowUpFromLine size={8} color="rgba(255,255,255,0.7)" strokeWidth={3} />
+        </View>
 
         {/* WiFi */}
         <TouchableOpacity
-          style={[styles.circleButton, { width: btnSize, height: btnSize, borderRadius: btnSize / 2 },
-            wifiActive ? styles.btnBlue : styles.btnInactive]}
-          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setWifiActive(!wifiActive); LauncherBridge?.openInternetPanel?.(); }}
-          activeOpacity={0.75}
+          style={[styles.quadrantBtn, { backgroundColor: '#007AFF' }]}
+          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.openSystemSettings?.('wifi'); }}
+          activeOpacity={0.7}
         >
-          <WifiIcon size={iconSize * 1.2} color="#fff" />
+          <Wifi size={iconSize * 1.1} color="#ffffff" strokeWidth={2.5} />
         </TouchableOpacity>
 
         {/* Bluetooth */}
         <TouchableOpacity
-          style={[styles.circleButton, { width: btnSize, height: btnSize, borderRadius: btnSize / 2 },
-            btActive ? styles.btnBlue : styles.btnInactive]}
-          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setBtActive(!btActive); LauncherBridge?.openBluetoothSettings?.(); }}
-          activeOpacity={0.75}
+          style={[styles.quadrantBtn, { backgroundColor: '#007AFF' }]}
+          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); LauncherBridge?.openSystemSettings?.('bluetooth'); }}
+          activeOpacity={0.7}
         >
-          <BluetoothIcon size={iconSize * 1.1} color="#fff" />
+          <Bluetooth size={iconSize * 1.1} color="#ffffff" strokeWidth={2.5} />
         </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -121,21 +72,16 @@ export function ConnectivityPlatter({ size }: ConnectivityPlatterProps) {
 
 const styles = StyleSheet.create({
   platterCard: {
-    borderRadius: 32,
-    borderWidth: 0.5,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 36,
+    borderWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.3)',
+    borderLeftColor: 'rgba(255, 255, 255, 0.12)',
+    borderRightColor: 'rgba(255, 255, 255, 0.12)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.12)',
     padding: 14,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
-  },
-  specularHighlight: {
-    position: 'absolute',
-    top: 0,
-    left: '10%',
-    right: '10%',
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
   gridContainer: {
     width: '100%',
@@ -145,12 +91,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignContent: 'space-between',
   },
-  circleButton: {
+  quadrantBtn: {
+    width: '46%',
+    aspectRatio: 1,
+    borderRadius: 999,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  btnInactive: { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
-  btnBlue: { backgroundColor: '#007AFF' },
-  btnGreen: { backgroundColor: '#34C759' },
-  btnOrange: { backgroundColor: '#FF9500' },
+  centerSmallBubble1: {
+    position: 'absolute', top: '50%', left: '50%',
+    width: 20, height: 20, borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    marginLeft: -10, marginTop: -22,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  centerSmallBubble2: {
+    position: 'absolute', top: '50%', left: '50%',
+    width: 20, height: 20, borderRadius: 10,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    marginLeft: -10, marginTop: 2,
+    justifyContent: 'center', alignItems: 'center',
+  }
 });
