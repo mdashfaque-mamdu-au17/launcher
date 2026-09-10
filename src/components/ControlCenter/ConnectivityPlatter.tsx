@@ -15,12 +15,13 @@ export function ConnectivityPlatter({ size }: ConnectivityPlatterProps) {
   const iconSize = Math.floor(btnSize * 0.42);
 
   return (
-    <LinearGradient
-      colors={['rgba(45, 45, 50, 0.65)', 'rgba(25, 25, 30, 0.65)']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={[styles.platterCard, { width: size, height: size }]}
-    >
+    <View style={[styles.platterCard, { width: size, height: size }]}>
+      <LinearGradient
+        colors={['rgba(45, 45, 50, 0.65)', 'rgba(25, 25, 30, 0.65)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={[StyleSheet.absoluteFill, { borderRadius: 36 }]}
+      />
       <View style={styles.gridContainer}>
         {/* Airplane */}
         <TouchableOpacity
@@ -66,7 +67,7 @@ export function ConnectivityPlatter({ size }: ConnectivityPlatterProps) {
           <Bluetooth size={iconSize * 1.1} color="#ffffff" strokeWidth={2.5} />
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -81,7 +82,6 @@ const styles = StyleSheet.create({
     padding: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
   },
   gridContainer: {
     width: '100%',

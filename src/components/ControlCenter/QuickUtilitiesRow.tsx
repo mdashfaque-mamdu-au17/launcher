@@ -141,8 +141,8 @@ interface BottomPillsProps {
 }
 
 export function BottomPillsRow({ twoColWidth, colWidth, onClose }: BottomPillsProps) {
-  const S = colWidth;
-  const iconSz = Math.floor(S * 0.42);
+  const S = Math.min(colWidth, 54);
+  const iconSz = Math.floor(S * 0.45);
 
   type Item = { icon: ReactElement; bg: string; onPress: () => void };
 
@@ -172,15 +172,16 @@ export function BottomPillsRow({ twoColWidth, colWidth, onClose }: BottomPillsPr
       {rows.map((row, ri) => (
         <View key={ri} style={styles.gridRow}>
           {row.map((item, ci) => (
-            <TouchableOpacity
-              key={ci}
-              style={[styles.gridCircle, { width: S, height: S, borderRadius: S / 2, backgroundColor: item.bg === 'glass' ? 'transparent' : item.bg }]}
-              onPress={item.onPress}
-              activeOpacity={0.7}
-            >
-              {item.bg === 'glass' && <GlassBackground borderRadius={S / 2} />}
-              {item.icon}
-            </TouchableOpacity>
+            <View key={ci} style={{ width: colWidth, alignItems: 'center' }}>
+              <TouchableOpacity
+                style={[styles.gridCircle, { width: S, height: S, borderRadius: S / 2, backgroundColor: item.bg === 'glass' ? 'transparent' : item.bg }]}
+                onPress={item.onPress}
+                activeOpacity={0.7}
+              >
+                {item.bg === 'glass' && <GlassBackground borderRadius={S / 2} />}
+                {item.icon}
+              </TouchableOpacity>
+            </View>
           ))}
         </View>
       ))}
