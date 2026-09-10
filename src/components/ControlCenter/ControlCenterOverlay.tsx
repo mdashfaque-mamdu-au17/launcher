@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
   ScrollView,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from '@react-native-community/blur';
@@ -210,6 +211,11 @@ export function ControlCenterOverlay({
     <View style={[StyleSheet.absoluteFill, styles.rootOverlay]} pointerEvents="box-none">
       {/* 100% Full-Screen Immersive Frosted Blur Backdrop */}
       <Animated.View style={[StyleSheet.absoluteFill, { opacity: fadeAnim }]}>
+        <Image
+          source={require('../../../assets/images/dark_glass_smudge.jpg')}
+          style={[StyleSheet.absoluteFill, { width: '100%', height: '100%', opacity: 0.85 }]}
+          resizeMode="cover"
+        />
         <BlurView
           style={StyleSheet.absoluteFill}
           blurType="dark"
