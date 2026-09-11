@@ -57,10 +57,10 @@ export function MiddleControls({
   const [dndActive, setDndActive] = useState(false);
   const [screenRecording, setScreenRecording] = useState(false);
 
-  const D = Math.min(colWidth, 54);
+  const D = Math.min(colWidth, 82);
 
   return (
-    <View style={[styles.middleCol, { width: twoColWidth }]}>
+    <View style={[{ width: twoColWidth, height: 180, justifyContent: 'space-between' }]}>
 
       {/* Row 1: Orientation + Bell */}
       <View style={styles.twoRow}>
@@ -87,47 +87,16 @@ export function MiddleControls({
 
       {/* Row 2: Focus Pill */}
       <TouchableOpacity
-        style={[styles.focusPill, { width: twoColWidth }, dndActive && styles.focusPillActive]}
+        style={[styles.focusPill, { width: twoColWidth, height: D, borderRadius: D / 2 }, dndActive && styles.focusPillActive]}
         onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setDndActive(!dndActive); }}
         activeOpacity={0.75}
       >
-        {!dndActive && <GlassBackground borderRadius={22} />}
+        {!dndActive && <GlassBackground borderRadius={D / 2} />}
         <View style={styles.focusInner}>
-          <Moon size={16} color="#ffffff" strokeWidth={2.5} />
+          <Moon size={20} color="#ffffff" strokeWidth={2.5} />
           <Text style={styles.focusLabel}> Focus</Text>
         </View>
       </TouchableOpacity>
-
-      {/* Row 3: 4 mini circles */}
-      <View style={styles.miniRow}>
-        <TouchableOpacity style={[styles.mini, torchOn && styles.miniWhite]} onPress={onToggleTorch} activeOpacity={0.75}>
-          {!torchOn && <GlassBackground borderRadius={19} />}
-          <Flashlight size={18} color={torchOn ? '#000' : '#fff'} strokeWidth={2.5} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.mini, screenRecording && styles.miniRed]}
-          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); setScreenRecording(!screenRecording); }}
-          activeOpacity={0.75}
-        >
-          {!screenRecording && <GlassBackground borderRadius={19} />}
-          <Disc size={18} color={screenRecording ? '#fff' : '#fff'} strokeWidth={2.5} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.mini}
-          onPress={() => { LauncherBridge?.triggerHaptic?.('click'); Alert.alert('Screen Mirror', 'Searching for displays...'); }}
-          activeOpacity={0.75}
-        >
-          <GlassBackground borderRadius={19} />
-          <ScreenShare size={18} color="#ffffff" strokeWidth={2.5} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.mini} onPress={onLaunchBattery} activeOpacity={0.75}>
-          <GlassBackground borderRadius={19} />
-          <Battery size={18} color="#FFD60A" strokeWidth={2.5} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -200,16 +169,11 @@ const styles = StyleSheet.create({
   circleYellow: { backgroundColor: '#FFD60A' },
   circleRed: { backgroundColor: '#FF3B30' },
   focusPill: {
-    height: 44, borderRadius: 22,
-    justifyContent: 'center', paddingHorizontal: 16,
+    justifyContent: 'center', paddingHorizontal: 20,
   },
   focusPillActive: { backgroundColor: '#5856D6' },
   focusInner: { flexDirection: 'row', alignItems: 'center' },
-  focusLabel: { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.9)', marginLeft: 8 },
-  miniRow: { flexDirection: 'row', gap: 8 },
-  mini: { width: 38, height: 38, borderRadius: 19, justifyContent: 'center', alignItems: 'center' },
-  miniWhite: { backgroundColor: '#ffffff' },
-  miniRed: { backgroundColor: 'rgba(255,59,48,0.2)' },
+  focusLabel: { fontSize: 16, fontWeight: '600', color: 'rgba(255,255,255,0.9)', marginLeft: 8 },
   bottomWrapper: { marginTop: 12, gap: 12 },
   gridRow: { flexDirection: 'row', justifyContent: 'space-between' },
   gridCircle: { justifyContent: 'center', alignItems: 'center' },
