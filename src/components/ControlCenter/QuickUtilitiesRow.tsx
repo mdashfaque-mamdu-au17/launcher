@@ -57,10 +57,10 @@ export function MiddleControls({
   const [dndActive, setDndActive] = useState(false);
   const [screenRecording, setScreenRecording] = useState(false);
 
-  const D = Math.min(colWidth, 82);
+  const D = colWidth;
 
   return (
-    <View style={[{ width: twoColWidth, height: 180, justifyContent: 'space-between' }]}>
+    <View style={[{ width: twoColWidth, gap: 12 }]}>
 
       {/* Row 1: Orientation + Bell */}
       <View style={styles.twoRow}>

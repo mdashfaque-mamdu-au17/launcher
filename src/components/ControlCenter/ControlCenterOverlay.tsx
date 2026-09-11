@@ -205,7 +205,7 @@ export function ControlCenterOverlay({
   const colGap = 12;
   const colWidth = Math.floor((usableWidth - colGap * 3) / 4);
   const twoColWidth = colWidth * 2 + colGap;
-  const sliderHeight = 180;
+  const sliderHeight = twoColWidth;
 
   return (
     <View style={[StyleSheet.absoluteFill, styles.rootOverlay]} pointerEvents="box-none">
