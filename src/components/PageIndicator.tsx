@@ -59,6 +59,7 @@ export function PageIndicator({ pageCount, total, current = 0, scrollX }: PageIn
                 {
                   width: isActive ? 20 : 7,
                   opacity: isActive ? 1 : 0.38,
+                  backgroundColor: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.72)',
                 },
               ]}
             />
@@ -85,6 +86,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 0.5,
     borderColor: 'rgba(255, 255, 255, 0.15)',
+    overflow: 'hidden',
   },
   pageDot: {
     height: 6,

@@ -169,3 +169,25 @@ Treat this as a compact activity surface rather than a decorative pill.
 - Do not represent restricted Android system settings as if the launcher can always toggle them directly.
 - Build reusable surfaces and state models before adding more one-off components.
 - Prefer a smaller, polished, daily-usable first release over an unfinished imitation of every iOS surface.
+
+## Feature Test Standard
+
+Every feature branch must define and complete the checks below before it is treated as ready to merge. Keep the checks focused on the feature—do not add a large test suite merely to satisfy a checklist.
+
+1. **Logic test:** pure state, layout, capability, and formatting rules have automated unit coverage where practical.
+2. **Component test:** important rendered states, callbacks, empty states, and unavailable/permission-gated states are covered.
+3. **Device acceptance test:** the feature is exercised on a real Android device with the intended touch path.
+4. **Visual acceptance test:** the feature is checked against its reference and relevant wallpaper/device variants.
+5. **Regression test:** the existing behavior nearest to the feature still works.
+6. **Performance check:** verify the interaction in a release or debug-optimized build; development-mode smoothness alone is not a pass criterion.
+
+Record failures, known limitations, and device-specific differences in the feature pull request or commit notes.
+
+### Wallpaper-Adaptive Glass — Acceptance Checklist
+
+- [ ] Dock and page indicator adapt their tint/contrast to each test wallpaper.
+- [ ] Test wallpapers include near-black, bright/white, blue/cyan, warm/red, high-detail photo, and low-detail gradient variants.
+- [ ] App labels and page state remain legible over every variant.
+- [ ] Glass edge, blur/frosting, and shadow are visible but do not overpower app icons.
+- [ ] Home-page swipe, app launch, long-press edit mode, and dock presses retain their current behavior.
+- [ ] The home screen does not visibly stutter while opening, swiping pages, or returning from an app.

@@ -26,6 +26,17 @@ export interface AppIconProps {
   onPress: (pkg: string) => void;
   onLongPress: () => void;
   onRemove: (app: AppItem) => void;
+  labelColor?: string;
+  labelShadowColor?: string;
+}
+
+export interface WallpaperPalette {
+  primary: string;
+  secondary?: string;
+  tertiary?: string;
+  dock?: string;
+  indicator?: string;
+  supportsDarkText: boolean;
 }
 
 export interface DockIconProps {

@@ -19,6 +19,8 @@ export function AppIconItem({
   onPress,
   onLongPress,
   onRemove,
+  labelColor = '#ffffff',
+  labelShadowColor = 'rgba(0, 0, 0, 0.8)',
 }: AppIconProps) {
   const pressScale = useRef(new Animated.Value(1)).current;
 
@@ -91,7 +93,11 @@ export function AppIconItem({
           )}
         </Animated.View>
 
-        <Text style={styles.appLabel} numberOfLines={1} ellipsizeMode="tail">
+        <Text
+          style={[styles.appLabel, { color: labelColor, textShadowColor: labelShadowColor }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {app.label}
         </Text>
       </View>
@@ -136,13 +142,11 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
   appLabel: {
-    color: '#ffffff',
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: '600',
     marginTop: 5,
     textAlign: 'center',
     width: ITEM_WIDTH - 6,
-    textShadowColor: 'rgba(0, 0, 0, 0.85)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
   },

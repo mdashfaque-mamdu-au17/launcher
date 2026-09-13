@@ -36,6 +36,7 @@ function LauncherContent() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [showControlCenter, setShowControlCenter] = useState(false);
+  const [usesDarkText, setUsesDarkText] = useState(false);
 
   const slideAnim = useRef(new Animated.Value(-height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -112,6 +113,21 @@ function LauncherContent() {
     }, 2000);
     return () => clearInterval(interval);
   }, [loadApps]);
+  useEffect(() => {
+    const refreshPalette = () => {
+      LauncherBridge.getWallpaperPalette()
+        .then(palette => setUsesDarkText(Boolean(palette?.supportsDarkText)))
+        .catch(() => undefined);
+    };
+    refreshPalette();
+    const interval = setInterval(refreshPalette, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const foregroundColor = usesDarkText ? '#18202A' : '#FFFFFF';
+  const secondaryForegroundColor = usesDarkText ? 'rgba(24, 32, 42, 0.78)' : 'rgba(255, 255, 255, 0.88)';
+  const labelShadowColor = usesDarkText ? 'rgba(255, 255, 255, 0.82)' : 'rgba(0, 0, 0, 0.78)';
+
 
   const visibleApps = useMemo(() => {
     return apps.filter(a => !hiddenPackages.has(a.packageName));
@@ -241,6 +257,8 @@ function LauncherContent() {
                     onPress={handleLaunchApp}
                     onLongPress={handleLongPress}
                     onRemove={handleRemoveApp}
+                    labelColor={foregroundColor}
+                    labelShadowColor={labelShadowColor}
                   />
                 ))}
               </View>

@@ -340,6 +340,65 @@ class LauncherBridgeModule(private val reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
+    fun getWallpaperPalette(promise: Promise) {
+        Thread {
+            try {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
+                    promise.resolve(null)
+                    return@Thread
+                }
+                val colors = android.app.WallpaperManager.getInstance(reactContext)
+                    .getWallpaperColors(android.app.WallpaperManager.FLAG_SYSTEM)
+                if (colors == null) {
+                    promise.resolve(null)
+                    return@Thread
+                }
+                fun hex(color: android.graphics.Color?): String? = color?.let {
+                    String.format("#%06X", 0xFFFFFF and it.toArgb())
+                }
+                // The overall palette is useful, but glass should also respond to the
+                // wallpaper area it sits on. Sampling a tiny bitmap keeps this inexpensive.
+                fun sampledHex(centerY: Float): String? = try {
+                    val wallpaper = android.app.WallpaperManager.getInstance(reactContext).drawable ?: return null
+                    val bitmap = Bitmap.createBitmap(48, 96, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bitmap)
+                    val previousBounds = android.graphics.Rect(wallpaper.bounds)
+                    wallpaper.setBounds(0, 0, bitmap.width, bitmap.height)
+                    wallpaper.draw(canvas)
+                    wallpaper.bounds = previousBounds
+                    val y = (bitmap.height * centerY).toInt().coerceIn(3, bitmap.height - 4)
+                    var red = 0L; var green = 0L; var blue = 0L; var count = 0L
+                    for (row in y - 3..y + 3) for (column in 17..30) {
+                        val pixel = bitmap.getPixel(column, row)
+                        red += android.graphics.Color.red(pixel); green += android.graphics.Color.green(pixel)
+                        blue += android.graphics.Color.blue(pixel); count++
+                    }
+                    bitmap.recycle()
+                    String.format("#%02X%02X%02X", red / count, green / count, blue / count)
+                } catch (_: Exception) { null }
+                val isHintDarkText = (colors.colorHints and android.app.WallpaperColors.HINT_SUPPORTS_DARK_TEXT) != 0
+                val primaryCol = colors.primaryColor
+                val isLuminanceBright = if (primaryCol != null) {
+                    val lum = 0.299f * primaryCol.red() + 0.587f * primaryCol.green() + 0.114f * primaryCol.blue()
+                    lum > 0.65f
+                } else false
+                val supportsDarkText = isHintDarkText || isLuminanceBright
+
+                val result = Arguments.createMap().apply {
+                    putString("primary", hex(colors.primaryColor))
+                    putString("secondary", hex(colors.secondaryColor))
+                    putString("tertiary", hex(colors.tertiaryColor))
+                    putString("dock", sampledHex(0.88f) ?: hex(colors.primaryColor))
+                    putString("indicator", sampledHex(0.77f) ?: hex(colors.primaryColor))
+                    putBoolean("supportsDarkText", supportsDarkText)
+                }
+                promise.resolve(result)
+            } catch (_: Exception) {
+                promise.resolve(null)
+            }
+        }.start()
+    }
+
     fun getBatteryStatus(promise: Promise) {
         try {
             val ifilter = android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED)

@@ -56,15 +56,21 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     fontWeight: '600',
-    color: 'rgba(255, 255, 255, 0.88)',
+    color: 'rgba(255, 255, 255, 0.95)',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
+    textShadowColor: 'rgba(0, 0, 0, 0.65)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 6,
   },
   timeText: {
     fontSize: 56,
     fontWeight: '200',
     color: '#ffffff',
     letterSpacing: -1,
+    textShadowColor: 'rgba(0, 0, 0, 0.65)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
   },
   doneButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.3)',

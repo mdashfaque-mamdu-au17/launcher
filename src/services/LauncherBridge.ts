@@ -1,5 +1,5 @@
 import { NativeModules } from 'react-native';
-import { AppItem, BatteryStatus } from '../types/launcher';
+import { AppItem, BatteryStatus, WallpaperPalette } from '../types/launcher';
 
 const LauncherBridgeNative = NativeModules.LauncherBridge;
 
@@ -86,9 +86,30 @@ export const NativeLauncher = {
     return LauncherBridgeNative.openDefaultAppsSettings();
   },
 
+  openSystemSettings: async (target: 'wifi' | 'network' | 'bluetooth' | 'airplane' | 'battery' | string): Promise<boolean> => {
+    switch (target) {
+      case 'wifi':
+      case 'network':
+        return NativeLauncher.openInternetPanel();
+      case 'bluetooth':
+        return NativeLauncher.openBluetoothSettings();
+      case 'airplane':
+        return NativeLauncher.openAirplaneSettings();
+      case 'battery':
+        return NativeLauncher.openBatterySettings();
+      default:
+        return NativeLauncher.openInternetPanel();
+    }
+  },
+
   triggerHaptic: async (type: 'click' | 'tick' | 'heavy' = 'click'): Promise<boolean> => {
     if (!LauncherBridgeNative?.triggerHaptic) return false;
     return LauncherBridgeNative.triggerHaptic(type);
+  },
+
+  getWallpaperPalette: async (): Promise<WallpaperPalette | null> => {
+    if (!LauncherBridgeNative?.getWallpaperPalette) return null;
+    return LauncherBridgeNative.getWallpaperPalette();
   },
 
   getBatteryStatus: async (): Promise<BatteryStatus> => {

@@ -2,13 +2,13 @@ import React, { useRef } from 'react';
 import {
   StyleSheet,
   View,
-  Text,
-  Image,
   Animated,
   TouchableWithoutFeedback,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { AppItem } from '../types/launcher';
 import { width } from '../constants/layout';
+import { IOSAppIcon } from './IOSAppIcon';
 
 interface DockIconProps {
   app: AppItem;
@@ -48,24 +48,7 @@ export function DockIconItem({ app, onPress, onLongPress }: DockIconProps) {
       <Animated.View
         style={[styles.dockItem, { transform: [{ scale: pressScale }] }]}
       >
-        <View style={styles.liquidGlassRim}>
-          <View style={styles.dockIconWrapper}>
-            {app.icon ? (
-              <Image
-                source={{ uri: app.icon }}
-                style={styles.dockIcon}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={styles.placeholderIcon}>
-                <Text style={styles.placeholderText}>
-                  {app.label.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-            )}
-          </View>
-          <View style={styles.specularShine} />
-        </View>
+        <IOSAppIcon app={app} size={58} />
       </Animated.View>
     </TouchableWithoutFeedback>
   );
@@ -80,15 +63,25 @@ interface DockProps {
 export function Dock({ apps, onPressApp, onLongPressApp }: DockProps) {
   return (
     <View style={styles.dockContainer}>
-      <View style={styles.glassDock}>
-        {apps.map((app, index) => (
-          <DockIconItem
-            key={`dock-${app.packageName}-${index}`}
-            app={app}
-            onPress={onPressApp}
-            onLongPress={onLongPressApp}
-          />
-        ))}
+      <View style={styles.glassDockWrapper}>
+        <LinearGradient
+          colors={['rgba(255, 255, 255, 0.28)', 'rgba(255, 255, 255, 0.12)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.glassDockGradient}
+        >
+          {/* Top specular curvature reflection */}
+          <View style={styles.specularShine} pointerEvents="none" />
+
+          {apps.map((app, index) => (
+            <DockIconItem
+              key={`dock-${app.packageName}-${index}`}
+              app={app}
+              onPress={onPressApp}
+              onLongPress={onLongPressApp}
+            />
+          ))}
+        </LinearGradient>
       </View>
     </View>
   );
@@ -100,15 +93,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6,
   },
-  glassDock: {
+  glassDockWrapper: {
     width: width - 32,
     height: 86,
-    backgroundColor: 'rgba(255, 255, 255, 0.22)',
+    borderRadius: 38,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
+    elevation: 8,
+  },
+  glassDockGradient: {
+    width: '100%',
+    height: '100%',
     borderRadius: 38,
     borderTopWidth: 1.5,
     borderTopColor: 'rgba(255, 255, 255, 0.65)',
     borderLeftWidth: 1,
-    borderLeftColor: 'rgba(255, 255, 255, 0.4)',
+    borderLeftColor: 'rgba(255, 255, 255, 0.40)',
     borderRightWidth: 1,
     borderRightColor: 'rgba(255, 255, 255, 0.25)',
     borderBottomWidth: 1,
@@ -117,68 +119,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 18,
-    elevation: 8,
-  },
-  dockItem: {
-    width: 58,
-    height: 58,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  liquidGlassRim: {
-    borderRadius: 18,
     overflow: 'hidden',
-    position: 'relative',
-    borderTopWidth: 1.5,
-    borderTopColor: 'rgba(255, 255, 255, 0.65)',
-    borderLeftWidth: 1,
-    borderLeftColor: 'rgba(255, 255, 255, 0.4)',
-    borderRightWidth: 1,
-    borderRightColor: 'rgba(255, 255, 255, 0.25)',
-    borderBottomWidth: 1.2,
-    borderBottomColor: 'rgba(0, 0, 0, 0.25)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.35,
-    shadowRadius: 7,
-    elevation: 5,
-  },
-  dockIconWrapper: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    overflow: 'hidden',
-  },
-  dockIcon: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 18,
   },
   specularShine: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '42%',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
+    height: '44%',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderTopLeftRadius: 38,
+    borderTopRightRadius: 38,
   },
-  placeholderIcon: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 18,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
+  dockItem: {
+    width: 58,
+    height: 58,
     alignItems: 'center',
-  },
-  placeholderText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
+    justifyContent: 'center',
   },
 });
