@@ -65,14 +65,11 @@ export function Dock({ apps, onPressApp, onLongPressApp }: DockProps) {
     <View style={styles.dockContainer}>
       <View style={styles.glassDockWrapper}>
         <LinearGradient
-          colors={['rgba(255, 255, 255, 0.28)', 'rgba(255, 255, 255, 0.12)']}
+          colors={['rgba(255, 255, 255, 0.30)', 'rgba(255, 255, 255, 0.12)']}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.glassDockGradient}
         >
-          {/* Top specular curvature reflection */}
-          <View style={styles.specularShine} pointerEvents="none" />
-
           {apps.map((app, index) => (
             <DockIconItem
               key={`dock-${app.packageName}-${index}`}
@@ -120,16 +117,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 16,
     overflow: 'hidden',
-  },
-  specularShine: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '44%',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderTopLeftRadius: 38,
-    borderTopRightRadius: 38,
   },
   dockItem: {
     width: 58,
