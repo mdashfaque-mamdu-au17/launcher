@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: '42%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'transparent',
   },
   centeredContent: {
     width: '100%',

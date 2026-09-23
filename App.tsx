@@ -37,6 +37,7 @@ function LauncherContent() {
   const [currentPage, setCurrentPage] = useState(0);
   const [showControlCenter, setShowControlCenter] = useState(false);
   const [usesDarkText, setUsesDarkText] = useState(false);
+  const [dockColor, setDockColor] = useState<string | null>(null);
 
   const slideAnim = useRef(new Animated.Value(-height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -116,7 +117,14 @@ function LauncherContent() {
   useEffect(() => {
     const refreshPalette = () => {
       LauncherBridge.getWallpaperPalette()
-        .then(palette => setUsesDarkText(Boolean(palette?.supportsDarkText)))
+        .then(palette => {
+          if (palette) {
+            setUsesDarkText(Boolean(palette.supportsDarkText));
+            if (palette.dock || palette.primary) {
+              setDockColor(palette.dock || palette.primary);
+            }
+          }
+        })
         .catch(() => undefined);
     };
     refreshPalette();
@@ -270,6 +278,8 @@ function LauncherContent() {
 
       <Dock
         apps={dockApps}
+        dockColor={dockColor}
+        isDarkText={usesDarkText}
         onPressApp={handleLaunchApp}
         onLongPressApp={handleLongPress}
       />
